@@ -1,0 +1,37 @@
+//@version=5
+strategy("ADX Trend Strategy", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=100)
+
+// Input parameters
+adxLength = input.int(14, "ADX Length", minval=1)
+adxThreshold = input.int(25, "ADX Threshold", minval=1, maxval=100)
+atrPeriod = input.int(14, "ATR Period", minval=1)
+atrMultiplier = input.float(2.0, "ATR Multiplier", minval=0.1, step=0.1)
+stopLossMultiplier = input.float(3.0, "Stop Loss ATR Multiplier", minval=0.1, step=0.1)
+
+// Calculate indicators
+adx = ta.adx(adxLength)
+atr = ta.atr(atrPeriod)
+
+// Entry conditions
+longCondition = adx > adxThreshold and ta.crossover(close, ta.sma(close, 20))
+shortCondition = adx > adxThreshold and ta.crossunder(close, ta.sma(close, 20))
+
+// Calculate stop loss and take profit levels
+longStopLoss = close - (atr * stopLossMultiplier)
+shortStopLoss = close + (atr * stopLossMultiplier)
+
+longTakeProfit = close + (atr * atrMultiplier)
+shortTakeProfit = close - (atr * atrMultiplier)
+
+// Execute trades
+if (longCondition)
+    strategy.entry("Long", strategy.long)
+    strategy.exit("Long Exit", "Long", stop=longStopLoss, limit=longTakeProfit)
+
+if (shortCondition)
+    strategy.entry("Short", strategy.short)
+    strategy.exit("Short Exit", "Short", stop=shortStopLoss, limit=shortTakeProfit)
+
+// Plotting
+plot(adx, "ADX", color=color.purple, linewidth=1)
+hline(adxThreshold, "ADX Threshold", color=color.red, linestyle=hline.style_dashed) 

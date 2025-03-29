@@ -1,0 +1,38 @@
+//@version=5
+strategy("Moving Average Crossover Strategy", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=100)
+
+// Input parameters
+fastLength = input.int(10, "Fast MA Length", minval=1)
+slowLength = input.int(20, "Slow MA Length", minval=1)
+atrPeriod = input.int(14, "ATR Period", minval=1)
+atrMultiplier = input.float(2.0, "ATR Multiplier", minval=0.1, step=0.1)
+stopLossMultiplier = input.float(3.0, "Stop Loss ATR Multiplier", minval=0.1, step=0.1)
+
+// Calculate indicators
+fastMA = ta.sma(close, fastLength)
+slowMA = ta.sma(close, slowLength)
+atr = ta.atr(atrPeriod)
+
+// Entry conditions
+longCondition = ta.crossover(fastMA, slowMA)
+shortCondition = ta.crossunder(fastMA, slowMA)
+
+// Calculate stop loss and take profit levels
+longStopLoss = close - (atr * stopLossMultiplier)
+shortStopLoss = close + (atr * stopLossMultiplier)
+
+longTakeProfit = close + (atr * atrMultiplier)
+shortTakeProfit = close - (atr * atrMultiplier)
+
+// Execute trades
+if (longCondition)
+    strategy.entry("Long", strategy.long)
+    strategy.exit("Long Exit", "Long", stop=longStopLoss, limit=longTakeProfit)
+
+if (shortCondition)
+    strategy.entry("Short", strategy.short)
+    strategy.exit("Short Exit", "Short", stop=shortStopLoss, limit=shortTakeProfit)
+
+// Plotting
+plot(fastMA, "Fast MA", color=color.blue, linewidth=1)
+plot(slowMA, "Slow MA", color=color.red, linewidth=1) 

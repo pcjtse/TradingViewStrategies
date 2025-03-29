@@ -1,0 +1,37 @@
+//@version=5
+strategy("Turtle Soup Strategy", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=100)
+
+// Input parameters
+lookbackPeriod = input.int(20, "Lookback Period", minval=1)
+atrPeriod = input.int(14, "ATR Period", minval=1)
+atrMultiplier = input.float(2.0, "ATR Multiplier", minval=0.1, step=0.1)
+stopLossMultiplier = input.float(3.0, "Stop Loss ATR Multiplier", minval=0.1, step=0.1)
+
+// Calculate indicators
+atr = ta.atr(atrPeriod)
+highestHigh = ta.highest(high, lookbackPeriod)
+lowestLow = ta.lowest(low, lookbackPeriod)
+
+// Entry conditions
+longCondition = low < lowestLow[1] and close > lowestLow[1]
+shortCondition = high > highestHigh[1] and close < highestHigh[1]
+
+// Calculate stop loss and take profit levels
+longStopLoss = close - (atr * stopLossMultiplier)
+shortStopLoss = close + (atr * stopLossMultiplier)
+
+longTakeProfit = close + (atr * atrMultiplier)
+shortTakeProfit = close - (atr * atrMultiplier)
+
+// Execute trades
+if (longCondition)
+    strategy.entry("Long", strategy.long)
+    strategy.exit("Long Exit", "Long", stop=longStopLoss, limit=longTakeProfit)
+
+if (shortCondition)
+    strategy.entry("Short", strategy.short)
+    strategy.exit("Short Exit", "Short", stop=shortStopLoss, limit=shortTakeProfit)
+
+// Plotting
+plot(highestHigh, "Highest High", color=color.red, linewidth=1)
+plot(lowestLow, "Lowest Low", color=color.green, linewidth=1) 
