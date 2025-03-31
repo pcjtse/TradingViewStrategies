@@ -9,7 +9,7 @@ atrMultiplier = input.float(2.0, "ATR Multiplier", minval=0.1, step=0.1)
 stopLossMultiplier = input.float(3.0, "Stop Loss ATR Multiplier", minval=0.1, step=0.1)
 
 // Calculate indicators
-adx = ta.adx(adxLength)
+[_, _, adx] = ta.dmi(adxLength, adxLength)
 atr = ta.atr(atrPeriod)
 
 // Entry conditions
