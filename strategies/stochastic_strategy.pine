@@ -11,7 +11,8 @@ atrMultiplier = input.float(2.0, "ATR Multiplier", minval=0.1, step=0.1)
 stopLossMultiplier = input.float(3.0, "Stop Loss ATR Multiplier", minval=0.1, step=0.1)
 
 // Calculate indicators
-[k, d] = ta.stoch(close, high, low, kLength)
+k = ta.stoch(close, high, low, kLength)
+d = ta.sma(k, dLength)
 atr = ta.atr(atrPeriod)
 
 // Entry conditions

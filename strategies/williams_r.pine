@@ -10,7 +10,7 @@ atrMultiplier = input.float(2.0, "ATR Multiplier", minval=0.1, step=0.1)
 stopLossMultiplier = input.float(3.0, "Stop Loss ATR Multiplier", minval=0.1, step=0.1)
 
 // Calculate indicators
-williamsR = ta.williamsr(williamsLength)
+williamsR = ta.wpr(williamsLength)
 atr = ta.atr(atrPeriod)
 
 // Entry conditions
